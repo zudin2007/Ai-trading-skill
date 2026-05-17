@@ -1,7 +1,7 @@
 #!/bin/bash
 # ============================================================================
 # AI Trading Analyst — Claude Code Skills Installer
-# 16 Skills · 5 Agents · Options · PDF Reports · Stock Screening
+# 5 Skills · 5 Agents · PDF Reports
 # ============================================================================
 set -e
 
@@ -17,7 +17,7 @@ echo ""
 echo -e "${BLUE}╔══════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║                                                              ║${NC}"
 echo -e "${BLUE}║${NC}   ${CYAN}AI Trading Analyst — Claude Code Skills${NC}                   ${BLUE}║${NC}"
-echo -e "${BLUE}║${NC}   ${GREEN}16 Skills · 5 Agents · Options · PDF Reports${NC}              ${BLUE}║${NC}"
+echo -e "${BLUE}║${NC}   ${GREEN}5 Skills · 5 Agents · PDF Reports${NC}                         ${BLUE}║${NC}"
 echo -e "${BLUE}║                                                              ║${NC}"
 echo -e "${BLUE}╚══════════════════════════════════════════════════════════════╝${NC}"
 echo ""
@@ -28,12 +28,12 @@ echo ""
 # ---------------------------------------------------------------------------
 # Detect script directory (handle both local and curl | bash)
 # ---------------------------------------------------------------------------
-GITHUB_REPO="zubair-trabzada/ai-trading-claude"
+GITHUB_REPO="zudin2007/ai-trading-skill"
 TEMP_DIR=""
 
 if [ -n "${BASH_SOURCE[0]}" ] && [ "${BASH_SOURCE[0]}" != "bash" ]; then
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    if [ -f "$SCRIPT_DIR/install.sh" ] && [ -d "$SCRIPT_DIR/skills" ]; then
+    if [ -f "$SCRIPT_DIR/SKILL.md" ]; then
         SOURCE_DIR="$SCRIPT_DIR"
         echo -e "${GREEN}Installing from local directory:${NC} $SOURCE_DIR"
     else
@@ -88,37 +88,27 @@ echo -e "${BLUE}Installing skills...${NC}"
 
 INSTALL_COUNT=0
 
-if [ -f "$SOURCE_DIR/trade/SKILL.md" ]; then
-    cp "$SOURCE_DIR/trade/SKILL.md" "$SKILLS_DIR/trade/SKILL.md"
+if [ -f "$SOURCE_DIR/SKILL.md" ]; then
+    cp "$SOURCE_DIR/SKILL.md" "$SKILLS_DIR/trade/SKILL.md"
     echo -e "  ${GREEN}✓${NC} trade (orchestrator)"
     INSTALL_COUNT=$((INSTALL_COUNT + 1))
 fi
 
 # ---------------------------------------------------------------------------
-# Install 15 sub-skills
+# Install sub-skills (trade-*.md files at repo root)
 # ---------------------------------------------------------------------------
 SKILLS=(
-    trade-analyze
     trade-technical
     trade-fundamental
     trade-sentiment
-    trade-sector
-    trade-compare
-    trade-thesis
-    trade-options
-    trade-portfolio
     trade-risk
-    trade-screen
-    trade-earnings
-    trade-watchlist
-    trade-report-pdf
-    trade-quick
+    trade-thesis
 )
 
 for skill in "${SKILLS[@]}"; do
-    if [ -f "$SOURCE_DIR/skills/$skill/SKILL.md" ]; then
+    if [ -f "$SOURCE_DIR/$skill.md" ]; then
         mkdir -p "$SKILLS_DIR/$skill"
-        cp "$SOURCE_DIR/skills/$skill/SKILL.md" "$SKILLS_DIR/$skill/SKILL.md"
+        cp "$SOURCE_DIR/$skill.md" "$SKILLS_DIR/$skill/SKILL.md"
         echo -e "  ${GREEN}✓${NC} $skill"
         INSTALL_COUNT=$((INSTALL_COUNT + 1))
     else
@@ -127,22 +117,15 @@ for skill in "${SKILLS[@]}"; do
 done
 
 # ---------------------------------------------------------------------------
-# Install 5 agents
+# Install agents (same source files, installed as agents)
 # ---------------------------------------------------------------------------
 echo -e "${BLUE}Installing agents...${NC}"
 
 AGENT_COUNT=0
-AGENTS=(
-    trade-technical
-    trade-fundamental
-    trade-sentiment
-    trade-risk
-    trade-thesis
-)
 
-for agent in "${AGENTS[@]}"; do
-    if [ -f "$SOURCE_DIR/agents/$agent.md" ]; then
-        cp "$SOURCE_DIR/agents/$agent.md" "$AGENTS_DIR/$agent.md"
+for agent in "${SKILLS[@]}"; do
+    if [ -f "$SOURCE_DIR/$agent.md" ]; then
+        cp "$SOURCE_DIR/$agent.md" "$AGENTS_DIR/$agent.md"
         echo -e "  ${GREEN}✓${NC} $agent"
         AGENT_COUNT=$((AGENT_COUNT + 1))
     else
@@ -156,7 +139,7 @@ done
 echo -e "${BLUE}Installing scripts...${NC}"
 
 SCRIPT_COUNT=0
-for script in "$SOURCE_DIR"/scripts/*.py; do
+for script in "$SOURCE_DIR"/*.py; do
     if [ -f "$script" ]; then
         cp "$script" "$SKILLS_DIR/trade/scripts/"
         echo -e "  ${GREEN}✓${NC} $(basename "$script")"
@@ -182,7 +165,6 @@ else
     echo -e "  ${RED}✗${NC} Python 3 not found — required for PDF reports"
 fi
 
-# Check reportlab
 if python3 -c "import reportlab" 2>/dev/null; then
     echo -e "  ${GREEN}✓${NC} reportlab installed"
 else
@@ -216,23 +198,13 @@ echo ""
 # ---------------------------------------------------------------------------
 echo -e "${BLUE}Command Reference:${NC}"
 echo ""
-echo -e "  ${CYAN}/trade analyze <ticker>${NC}      Full stock analysis (5 parallel agents)"
-echo -e "  ${CYAN}/trade quick <ticker>${NC}        60-second stock snapshot"
 echo -e "  ${CYAN}/trade technical <ticker>${NC}    Technical analysis (price, indicators)"
 echo -e "  ${CYAN}/trade fundamental <ticker>${NC}  Fundamental analysis (financials, moat)"
 echo -e "  ${CYAN}/trade sentiment <ticker>${NC}    News & social sentiment"
-echo -e "  ${CYAN}/trade sector <sector>${NC}       Sector rotation & momentum"
-echo -e "  ${CYAN}/trade compare <t1> <t2>${NC}     Head-to-head stock comparison"
-echo -e "  ${CYAN}/trade thesis <ticker>${NC}       Investment thesis with entry/exit"
-echo -e "  ${CYAN}/trade options <ticker>${NC}      Options strategy recommendations"
-echo -e "  ${CYAN}/trade portfolio${NC}             Portfolio analysis & rebalancing"
 echo -e "  ${CYAN}/trade risk <ticker>${NC}         Risk assessment & position sizing"
-echo -e "  ${CYAN}/trade screen <criteria>${NC}     Stock screener by strategy"
-echo -e "  ${CYAN}/trade earnings <ticker>${NC}     Pre-earnings analysis"
-echo -e "  ${CYAN}/trade watchlist${NC}             Build/update scored watchlist"
-echo -e "  ${CYAN}/trade report-pdf${NC}            Professional PDF investment report"
+echo -e "  ${CYAN}/trade thesis <ticker>${NC}       Investment thesis with entry/exit"
 echo ""
-echo -e "  ${YELLOW}Tip:${NC} Start with ${CYAN}/trade analyze <ticker>${NC} for a full multi-agent analysis!"
+echo -e "  ${YELLOW}Tip:${NC} Start with ${CYAN}/trade technical <ticker>${NC} for a quick analysis!"
 echo ""
 echo -e "  ${RED}DISCLAIMER:${NC} This tool is for educational and research purposes only."
 echo -e "  It is NOT financial advice. It does NOT execute trades."
